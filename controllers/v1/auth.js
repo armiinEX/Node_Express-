@@ -1,6 +1,8 @@
 const userModel = require('../../models/user');
 const registerValidator = require('../../validators/register');
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+
 
 exports.register = async (req, res) => {
     const validationResult = registerValidator(req.body);
@@ -32,6 +34,10 @@ exports.register = async (req, res) => {
         password: hashedPassword,
         role: countOfUsers > 0 ? "USER" : "ADMIN",
     });
+
+    const accessToken = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {expiresIn: '30d'});
+
+    return res.status(201).json({ user, accessToken });
 };
 exports.login = async (req, res) => { };
 exports.getMe = async (req, res) => { };
