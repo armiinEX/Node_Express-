@@ -5,9 +5,9 @@ const schema = {
     name: { type: "string", min: 3, max: 255 },
     username: { type: "string", min: 3, max: 100 },
     email: { type: "email", min: 8, max: 100 },
-    phone: { type: "number", max: 11 },
+    phone: { type: "string"},
     password: { type: "string", min: 8, max: 100 },
-    confirm_password: { type: "equal", field: "password" },
+    confirmPassword: { type: "equal", field: "password" },
     $$strict: true
 };
 

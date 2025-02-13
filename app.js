@@ -8,8 +8,11 @@ const app = express();
 
 app.use("/courses/covers", express.static(path.join(__dirname, "public", "courses", 'covers')));
 app.use(cors());
-app.use('/v1/auth', authRouter);
+app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+
+
+
+app.use('/v1/auth', authRouter); 
 
 module.exports = app;
