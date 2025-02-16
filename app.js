@@ -3,6 +3,7 @@ const authRouter = require('./routes/v1/auth');
 const cors = require('cors');
 const path = require('path');
 const bodyParser = require('body-parser');
+const usersRouter = require('./routes/v1/user');
 
 const app = express();
 
@@ -13,6 +14,8 @@ app.use(bodyParser.json());
 
 
 
-app.use('/v1/auth', authRouter); 
+app.use('/v1/auth', authRouter);
+app.use('/v1/users', usersRouter); 
+
 
 module.exports = app;
