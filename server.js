@@ -15,6 +15,11 @@ console.log(PORT);
     }
 })();
 
+app.get('/', (req, res) => {
+    console.log("Token =>", req.header("authorization").split(" ")[1]);
+    res.json('OK');
+});
+
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
