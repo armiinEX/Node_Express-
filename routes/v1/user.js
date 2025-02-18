@@ -1,10 +1,13 @@
 const express = require('express');
+const userController = require('./../../controllers/v1/user');
+const authMiddleware = require('./../../middlewares/auth');
+const isAdminMiddleware = require('./../../middlewares/isAdmin');
+
 const router = express.Router();
-const userController = require('../../controllers/v1/user');
-const { routes } = require('../../app');
 
-
-router.route("/ban/:id").post(userController.banUser);
+router
+.route("/ban/:id")
+.post(authMiddleware, isAdminMiddleware, userController.banUser);
 
 
 module.exports = router;
