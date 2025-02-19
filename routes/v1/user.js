@@ -6,8 +6,12 @@ const isAdminMiddleware = require('./../../middlewares/isAdmin');
 const router = express.Router();
 
 router
-.route("/ban/:id")
-.post(authMiddleware, isAdminMiddleware, userController.banUser);
+  .route("/")
+  .get(authMiddleware, isAdminMiddleware, userController.getAllUsers);
+
+router
+  .route("/ban/:id")
+  .post(authMiddleware, isAdminMiddleware, userController.banUser);
 
 
 module.exports = router;
