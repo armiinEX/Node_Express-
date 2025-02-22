@@ -11,8 +11,12 @@ router
 
 router
   .route("/:id")
-  .delete(userController.removeUser);
+  .delete(authMiddleware, isAdminMiddleware, userController.removeUser);
   
+router
+  .route("/role")
+  .put(authMiddleware, isAdminMiddleware, userController.changeRole);
+
 
 router
   .route("/ban/:id")
