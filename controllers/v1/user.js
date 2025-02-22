@@ -1,6 +1,7 @@
 const userModule = require('./../../models/user');
 const banUserModule = require('./../../models/ban_phone');
 const { default: mongoose, isValidObjectId} = require('mongoose');
+const bcrypt = require("bcrypt")
 
 exports.banUser = async (req, res) => {
     const mainUser = await userModule.findOne({ _id: req.params.id }).lean();
@@ -44,7 +45,7 @@ exports.removeUser = async (req, res) => {
 exports.changeRole = async (req, res) => {
     const { id } = req.body;
     const isValidUserID = isValidObjectId(id);
-    console.log(isValidUserID);
+    // console.log(isValidUserID);
     
     if (!isValidUserID) {
         return res.status(409).json({ message: 'Invalid user ID ... :(' });
@@ -52,10 +53,29 @@ exports.changeRole = async (req, res) => {
 
     const user = await userModule.findOne({ _id: id });
     let newRole = user.role === 'ADMIN' ? 'USER' : 'ADMIN';
-    console.log(newRole);
+    // console.log(newRole);
     const updatedUser = await userModule.findByIdAndUpdate({ _id: id }, { role: newRole });
 
     if (updatedUser) {
         return res.status(200).json({ message: 'User role changed successfuly ... :)' });
     };
+};
+
+exports.updatedUser = async (req, res) => {
+    const {name, username, email, password, phone} = req.body;
+    const hashedPassword = await bcrypt.hash(password, 12);
+    const user = await userModule.findByIdAndUpdate(
+        {_id: req.user._id},
+        {
+            name,
+            username,
+            email,
+            password: hashedPassword,
+            phone,
+        }
+    )
+    .select("-password")
+    .lean();
+
+    return res.json(user)
 };
