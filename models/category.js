@@ -4,12 +4,11 @@ const mongoose = require("mongoose");
 const schema = mongoose.Schema({
     title: {
         type: String,
-        required: true
+        required: true,
     },
     href: {
         type: String,
-        required: true
-
+        required: true,
     }
 });
 
