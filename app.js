@@ -17,7 +17,7 @@ app.use(bodyParser.json());
 
 app.use('/v1/auth', authRouter);
 app.use('/v1/users', usersRouter);
-app.use('/v1/categories', categoryRouter); 
+app.use('/v1/category', categoryRouter); 
 
 
 module.exports = app;
