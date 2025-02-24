@@ -4,6 +4,7 @@ const cors = require('cors');
 const path = require('path');
 const bodyParser = require('body-parser');
 const usersRouter = require('./routes/v1/user');
+const categoryRouter = require('./routes/v1/category');
 
 const app = express();
 
@@ -15,7 +16,8 @@ app.use(bodyParser.json());
 
 
 app.use('/v1/auth', authRouter);
-app.use('/v1/users', usersRouter); 
+app.use('/v1/users', usersRouter);
+app.use('/v1/categories', categoryRouter); 
 
 
 module.exports = app;
