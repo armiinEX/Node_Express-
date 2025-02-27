@@ -49,3 +49,9 @@ exports.createSession = async (req, res) => {
 
     return res.status(201).json(session);
 };
+
+exports.getAllSessions = async (req, res) => {
+    const sessions = await sessionModel.find({}).populate("course", "name").lean();
+
+    return res.json(sessions);
+};
