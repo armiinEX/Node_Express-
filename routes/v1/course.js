@@ -25,7 +25,10 @@ router.route("/:id/sessions")
 
 router.route("/sessions").get(authMiddleware, isAdminMiddleware, cousrsesController.getAllSessions);
 
-router.route("/:href/:sessionID").get(cousrsesController.getSessionInfo)
+router.route("/:href/:sessionID").get(cousrsesController.getSessionInfo);
+
+router.route("/session/:id").delete(authMiddleware, isAdminMiddleware, cousrsesController.removeSession);
+
 
 
 module.exports = router;

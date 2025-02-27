@@ -63,3 +63,15 @@ exports.getSessionInfo = async (req, res) => {
 
     return res.json({ session, sessions })
 };
+
+exports.removeSession = async (req, res) => {
+    const deletedCourse = await sessionModel.findOneAndDelete({_id: req.params.id});
+    
+    if (!deletedCourse) {
+        return res.status(404).json({
+            message: "Course not found ..."
+        });
+    };
+
+    return res.json(deletedCourse);
+};
