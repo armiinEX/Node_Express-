@@ -12,7 +12,7 @@ const schema = mongoose.Schema({
 
     },
     free: {
-        type: Boolean,
+        type: Number, // 0 => notfree | 1 => free
         required: true
     },
     video: {

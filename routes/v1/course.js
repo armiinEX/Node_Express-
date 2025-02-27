@@ -10,6 +10,16 @@ router.route('/')
     .post(multer({ storage: multerStorage, limits: { fileSize: 1000000000 } }).single('cover'),
         authMiddleware,
         isAdminMiddleware,
-        cousrsesController.create);
+        cousrsesController.create
+    );
+
+
+router.route("/:id/sessions")
+    .post(
+        // multer({ storage: multerStorage, limits: { fileSize: 1000000000 } }).single('video'),
+        authMiddleware,
+        isAdminMiddleware,
+        cousrsesController.createSession)
+
 
 module.exports = router;
