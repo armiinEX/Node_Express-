@@ -14,6 +14,9 @@ router.route('/')
     );
 
 
+router.route("/:href").get(cousrsesController.getOne)
+
+
 router.route("/:id/sessions")
     .post(
         // multer({ storage: multerStorage, limits: { fileSize: 1000000000 } }).single('video'),

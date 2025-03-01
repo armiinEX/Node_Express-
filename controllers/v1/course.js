@@ -1,5 +1,6 @@
 const courseModel = require('../../models/course');
 const sessionModel = require("./../../models/session");
+const commentsModel = require("./../../models/comments");
 const categoryModel = require("./../../models/category");
 const courseUserModel = require('../../models/course-user');
 
@@ -31,8 +32,8 @@ exports.create = async (req, res) => {
     });
 
     const mainCourse = await courseModel
-        .findById(course._id)
-        .populate("creator", "-password");
+      .findById(course._id)
+      .populate("creator", "-password");
 
     return res.status(201).json(mainCourse);
 };
@@ -80,10 +81,10 @@ exports.removeSession = async (req, res) => {
 
 exports.register = async (req, res) => {
     const isUserAlreadyRegister = await courseUserModel
-        .findOne({
-            user: req.user._id,
-            course: req.params.id,
-        }).lean();
+      .findOne({
+          user: req.user._id,
+          course: req.params.id,
+      }).lean();
 
     if (isUserAlreadyRegister) {
         return res.status(409).json({
@@ -103,7 +104,7 @@ exports.register = async (req, res) => {
 };
 
 exports.getCoursesByCategory = async (req, res) => {
-    const { href } = req.params;
+    const {href} = req.params;
     const category = await categoryModel.findOne({href: href});
 
     if (category) {
@@ -114,4 +115,25 @@ exports.getCoursesByCategory = async (req, res) => {
     } else {
         return res.json([]);
     }
-}; 
+};
+
+exports.getOne = async (req, res) => {
+    const course = await courseModel
+        .findOne({href: req.params.href})
+        .populate("creator", "-password")
+        .populate("categoryID")
+        .lean();
+        
+    const sessions = await sessionModel.find({course: course._id})
+    .populate("course")
+    .lean();
+
+    const comments = await commentsModel.find({course: course._id, isAccept: 1})
+        .populate("creator", "-password")
+        .lean();
+
+    // const courseStudentsCount = await courseUserModel.find({course: course._id}).count();// منسوخ شده
+    const courseStudentsCount = await courseUserModel.countDocuments({ course: course._id });
+
+    return res.json({course, sessions, comments, courseStudentsCount});
+};
