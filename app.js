@@ -21,8 +21,8 @@ app.use(bodyParser.json());
 app.use('/v1/auth', authRouter);
 app.use('/v1/users', usersRouter);
 app.use('/v1/category', categoryRouter);
-app.use('/v1/courses', coursesRouter); 
 app.use('/v1/comments', commentsRouter); 
+app.use('/v1/courses', coursesRouter); 
 
 
 

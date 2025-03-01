@@ -1,5 +1,6 @@
 const courseModel = require('../../models/course');
 const sessionModel = require("./../../models/session");
+const categoryModel = require("./../../models/category");
 const courseUserModel = require('../../models/course-user');
 
 
@@ -100,3 +101,17 @@ exports.register = async (req, res) => {
         message: "you are registered successfully :))",
     });
 };
+
+exports.getCoursesByCategory = async (req, res) => {
+    const { href } = req.params;
+    const category = await categoryModel.findOne({href: href});
+
+    if (category) {
+        const categoryCourses = await courseModel.find({
+            categoryID: category._id,
+        });
+        return res.json(categoryCourses);
+    } else {
+        return res.json([]);
+    }
+}; 
