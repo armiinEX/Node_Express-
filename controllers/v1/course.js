@@ -3,6 +3,7 @@ const sessionModel = require("./../../models/session");
 const commentsModel = require("./../../models/comments");
 const categoryModel = require("./../../models/category");
 const courseUserModel = require('../../models/course-user');
+const mongoose = require("mongoose");
 
 
 exports.create = async (req, res) => {
@@ -142,4 +143,24 @@ exports.getOne = async (req, res) => {
     
 
     return res.json({course, sessions, comments, courseStudentsCount});
+};
+
+exports.remove = async (req, res) => {
+    const isObjectValidID = mongoose.Types.ObjectId.isValid(req.params.id);
+
+    if (!isObjectValidID) {
+        return res.status(409).json({
+            message: "CourseID not valid ...",
+        })
+    }
+
+    const deletedCourse = await courseModel.findOneAndDelete({_id: req.params.id});
+
+    if (!deletedCourse) {
+        return res.status(404).json({
+            message: "Course not found ...",
+        })
+    }
+
+    return res.json({message: "course has been removed successfully!", deletedCourse});
 };
