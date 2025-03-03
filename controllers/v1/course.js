@@ -135,5 +135,11 @@ exports.getOne = async (req, res) => {
     // const courseStudentsCount = await courseUserModel.find({course: course._id}).count();// منسوخ شده
     const courseStudentsCount = await courseUserModel.countDocuments({ course: course._id });
 
+    let isUserRegisteredToThisCourse = !!(await courseUserModel.findOne({
+        user: req.user._id,
+        course: course._id,
+    }));
+    
+
     return res.json({course, sessions, comments, courseStudentsCount});
 };

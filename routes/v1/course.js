@@ -14,9 +14,6 @@ router.route('/')
     );
 
 
-router.route("/:href").get(cousrsesController.getOne)
-
-
 router.route("/:id/sessions")
     .post(
         // multer({ storage: multerStorage, limits: { fileSize: 1000000000 } }).single('video'),
@@ -35,5 +32,7 @@ router.route("/session/:id").delete(authMiddleware, isAdminMiddleware, cousrsesC
 router.route("/:id/register").post(authMiddleware, cousrsesController.register);
 
 router.route("/category/:href").get(cousrsesController.getCoursesByCategory);
+
+router.route("/:href").get(authMiddleware ,cousrsesController.getOne)
 
 module.exports = router;
