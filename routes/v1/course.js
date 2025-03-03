@@ -25,6 +25,8 @@ router.route("/:id/sessions")
 
 router.route("/sessions").get(authMiddleware, isAdminMiddleware, cousrsesController.getAllSessions);
 
+router.route("/related/:href").get(authMiddleware, isAdminMiddleware, cousrsesController.getRelated);
+
 router.route("/:href/:sessionID").get(cousrsesController.getSessionInfo);
 
 router.route("/session/:id").delete(authMiddleware, isAdminMiddleware, cousrsesController.removeSession);
@@ -36,5 +38,6 @@ router.route("/category/:href").get(cousrsesController.getCoursesByCategory);
 router.route("/:href").get(authMiddleware, cousrsesController.getOne);
 
 router.route("/:id").delete(authMiddleware, isAdminMiddleware, cousrsesController.remove);
+
 
 module.exports = router;
