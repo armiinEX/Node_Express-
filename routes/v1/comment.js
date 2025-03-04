@@ -6,4 +6,7 @@ const isAdminMiddleware = require("./../../middlewares/isAdmin");
 
 router.route("/").post(authMiddleware, commentController.create);
 
-module.exports = router;  // ✅ تایپ درست
+router.route("/:id").delete(authMiddleware, isAdminMiddleware, commentController.remove);
+
+
+module.exports = router;
