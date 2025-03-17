@@ -16,8 +16,6 @@ exports.create = async (req, res) => {
         status,
         discount,
         categoryID,
-        creator,
-        score,
     } = req.body;
 
     const course = await courseModel.create({
@@ -41,8 +39,8 @@ exports.create = async (req, res) => {
 };
 
 exports.createSession = async (req, res) => {
-    const {title, time, free} = req.body;
-    const {id} = req.params;
+    const { title, time, free } = req.body;
+    const { id } = req.params;
 
     const session = await sessionModel.create({
         title,
@@ -62,15 +60,15 @@ exports.getAllSessions = async (req, res) => {
 };
 
 exports.getSessionInfo = async (req, res) => {
-    const course = await courseModel.findOne({href: req.params.href}).lean();
-    const session = await sessionModel.findOne({_id: req.params.sessionID});
-    const sessions = await sessionModel.find({course: course._id});
+    const course = await courseModel.findOne({ href: req.params.href }).lean();
+    const session = await sessionModel.findOne({ _id: req.params.sessionID });
+    const sessions = await sessionModel.find({ course: course._id });
 
-    return res.json({session, sessions})
+    return res.json({ session, sessions })
 };
 
 exports.removeSession = async (req, res) => {
-    const deletedCourse = await sessionModel.findOneAndDelete({_id: req.params.id});
+    const deletedCourse = await sessionModel.findOneAndDelete({ _id: req.params.id });
 
     if (!deletedCourse) {
         return res.status(404).json({
@@ -106,8 +104,8 @@ exports.register = async (req, res) => {
 };
 
 exports.getCoursesByCategory = async (req, res) => {
-    const {href} = req.params;
-    const category = await categoryModel.findOne({href: href});
+    const { href } = req.params;
+    const category = await categoryModel.findOne({ href: href });
 
     if (category) {
         const categoryCourses = await courseModel.find({
@@ -121,21 +119,21 @@ exports.getCoursesByCategory = async (req, res) => {
 
 exports.getOne = async (req, res) => {
     const course = await courseModel
-        .findOne({href: req.params.href})
+        .findOne({ href: req.params.href })
         .populate("creator", "-password")
         .populate("categoryID")
         .lean();
 
-    const sessions = await sessionModel.find({course: course._id})
+    const sessions = await sessionModel.find({ course: course._id })
         .populate("course")
         .lean();
 
-    const comments = await commentsModel.find({course: course._id, isAccept: 1})
+    const comments = await commentsModel.find({ course: course._id, isAccept: 1 })
         .populate("creator", "-password")
         .lean();
 
     // const courseStudentsCount = await courseUserModel.find({course: course._id}).count();// منسوخ شده
-    const courseStudentsCount = await courseUserModel.countDocuments({course: course._id});
+    const courseStudentsCount = await courseUserModel.countDocuments({ course: course._id });
 
     let isUserRegisteredToThisCourse = !!(await courseUserModel.findOne({
         user: req.user._id,
@@ -149,7 +147,7 @@ exports.getOne = async (req, res) => {
         comments.forEach((answerComment) => {
             if (String(comment._id) === String(answerComment.mainCommentID)) {
                 allComments.push({
-                    ... comment,
+                    ...comment,
                     course: comment.course.name,
                     creator: comment.creator.name,
                     answerComment,
@@ -176,7 +174,7 @@ exports.remove = async (req, res) => {
         })
     }
 
-    const deletedCourse = await courseModel.findOneAndDelete({_id: req.params.id});
+    const deletedCourse = await courseModel.findOneAndDelete({ _id: req.params.id });
 
     if (!deletedCourse) {
         return res.status(404).json({
@@ -184,12 +182,12 @@ exports.remove = async (req, res) => {
         })
     }
 
-    return res.json({message: "course has been removed successfully!", deletedCourse});
+    return res.json({ message: "course has been removed successfully!", deletedCourse });
 };
 
 exports.getRelated = async (req, res) => {
-    const {href} = req.params;
-    const course = await courseModel.findOne({href});
+    const { href } = req.params;
+    const course = await courseModel.findOne({ href });
 
     if (!course) {
         return res.status(404).json({
@@ -197,11 +195,11 @@ exports.getRelated = async (req, res) => {
         })
     }
 
-    let relatedCourses = await courseModel.find({categoryID: course.categoryID});
+    let relatedCourses = await courseModel.find({ categoryID: course.categoryID });
 
     relatedCourses = relatedCourses.filter(course => course.href !== href);
 
-    return res.json(relatedCourses); 
+    return res.json(relatedCourses);
 };
 
 exports.popular = async (req, res) => {
@@ -238,3 +236,38 @@ exports.pre_sell = async (req, res) => {
     }
 };
 
+exports.getAll = async (req, res) => {
+    const courses = await courseModel
+        .find({})
+        .populate("creator", "-password")
+        .populate("categoryID")
+        .lean()
+        .sort({ _id: -1 });
+
+    const registers = await courseUserModel.find({}).lean();
+    const comments = await commentsModel.find({}).lean();
+    const allCourses = [];
+
+    courses.forEach((course) => {
+        let courseTotalScore = 5;
+
+        const courseRegisters = registers
+            .filter((register) => register.course.toString() === course._id.toString());
+
+        const courseComments = comments.filter((comment) => {
+            return comment.course.toString() === course._id.toString();
+        });
+
+        courseComments.forEach(comment => courseTotalScore += Number(comment.score))
+
+        allCourses.push({
+            ... course,
+            categoryID: course.categoryID.title,
+            creator: course.creator.username,
+            registers: courseRegisters.length,
+            courseAverageScore: Math.floor(courseTotalScore / (courseComments.length + 1)),
+        });
+    });
+
+    return res.json(allCourses);
+};

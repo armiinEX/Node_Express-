@@ -13,6 +13,9 @@ const searchRouter = require("./routes/v1/search");
 const notificationRouter = require("./routes/v1/notification");
 const offRouter = require("./routes/v1/off");
 const articleRouter = require("./routes/v1/article");
+const orderRouter = require("./routes/v1/order");
+const ticketRouter = require("./routes/v1/ticket");
+const menuRouter = require("./routes/v1/menu");
 
 
 const app = express();
@@ -34,6 +37,10 @@ app.use('/v1/searchs', searchRouter);
 app.use('/v1/notifications', notificationRouter);
 app.use('/v1/offs', offRouter);
 app.use('/v1/articles', articleRouter);
+app.use('/v1/orders', orderRouter);
+app.use('/v1/tickets', ticketRouter);
+app.use('/v1/menus', menuRouter);
+ 
  
 
 

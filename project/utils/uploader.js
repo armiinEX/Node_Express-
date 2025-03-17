@@ -4,7 +4,7 @@ const crypto = require('crypto');   // Node.js built-in module
 
 
 module.exports = multer.diskStorage({
-    distination: (req, file, cb) => {
+    destination: (req, file, cb) => {
         cb(null, path.join(__dirname, '..', "public", "courses", "covers"));
     },
     filename: (req, file, cb) => {

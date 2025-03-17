@@ -2,16 +2,17 @@ const express = require('express');
 const cousrsesController = require('./../../controllers/v1/course');
 const authMiddleware = require('./../../middlewares/auth');
 const isAdminMiddleware = require('./../../middlewares/isAdmin');
-const multerStorage = require("./../../utils/uploader");
 const multer = require('multer');
+const multerStorage = require("./../../utils/uploader");
 const router = express.Router();
 
 router.route('/')
-    .post(multer({ storage: multerStorage, limits: { fileSize: 1000000000 } }).single('cover'),
+    .post(
         authMiddleware,
         isAdminMiddleware,
-        cousrsesController.create
-    );
+        multer({ storage: multerStorage, limits: { fileSize: 1000000000 } }).single('cover'),
+        cousrsesController.create)
+    .get(authMiddleware, isAdminMiddleware, cousrsesController.getAll);
 
 
 router.route("/:id/sessions")

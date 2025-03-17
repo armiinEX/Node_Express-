@@ -15,13 +15,14 @@ const schema = mongoose.Schema({
     },
     cover: {
         type: String,
-        required: true,
+        // required: true,
     },
     href: {
         type: String,
         required: true,
+        unique: true,
     },
-    categoryId: {
+    categoryID: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Category',
         required: true,
