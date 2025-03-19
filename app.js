@@ -6,7 +6,16 @@ const bodyParser = require('body-parser');
 const usersRouter = require('./routes/v1/user');
 const categoryRouter = require('./routes/v1/category');
 const coursesRouter = require('./routes/v1/course');
-const commentsRouter = require("./routes/v1/comment")
+const commentsRouter = require("./routes/v1/comment");
+const contactsRouter = require("./routes/v1/contact");
+const newsletterRouter = require("./routes/v1/newsletter");
+const searchRouter = require("./routes/v1/search");
+const notificationRouter = require("./routes/v1/notification");
+const offRouter = require("./routes/v1/off");
+const articleRouter = require("./routes/v1/article");
+const orderRouter = require("./routes/v1/order");
+const ticketRouter = require("./routes/v1/ticket");
+const menuRouter = require("./routes/v1/menu");
 
 
 const app = express();
@@ -17,13 +26,22 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 
-
 app.use('/v1/auth', authRouter);
 app.use('/v1/users', usersRouter);
 app.use('/v1/category', categoryRouter);
 app.use('/v1/comments', commentsRouter); 
 app.use('/v1/courses', coursesRouter); 
-
+app.use('/v1/contacts', contactsRouter);
+app.use('/v1/newsletters', newsletterRouter);
+app.use('/v1/searchs', searchRouter);
+app.use('/v1/notifications', notificationRouter);
+app.use('/v1/offs', offRouter);
+app.use('/v1/articles', articleRouter);
+app.use('/v1/orders', orderRouter);
+app.use('/v1/tickets', ticketRouter);
+app.use('/v1/menus', menuRouter);
+ 
+ 
 
 
 module.exports = app;

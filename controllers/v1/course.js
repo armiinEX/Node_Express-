@@ -16,7 +16,6 @@ exports.create = async (req, res) => {
         status,
         discount,
         categoryID,
-        creator,
     } = req.body;
 
     const course = await courseModel.create({
@@ -33,15 +32,15 @@ exports.create = async (req, res) => {
     });
 
     const mainCourse = await courseModel
-      .findById(course._id)
-      .populate("creator", "-password");
+        .findById(course._id)
+        .populate("creator", "-password");
 
     return res.status(201).json(mainCourse);
 };
 
 exports.createSession = async (req, res) => {
-    const {title, time, free} = req.body;
-    const {id} = req.params;
+    const { title, time, free } = req.body;
+    const { id } = req.params;
 
     const session = await sessionModel.create({
         title,
@@ -61,15 +60,15 @@ exports.getAllSessions = async (req, res) => {
 };
 
 exports.getSessionInfo = async (req, res) => {
-    const course = await courseModel.findOne({href: req.params.href}).lean();
-    const session = await sessionModel.findOne({_id: req.params.sessionID});
-    const sessions = await sessionModel.find({course: course._id});
+    const course = await courseModel.findOne({ href: req.params.href }).lean();
+    const session = await sessionModel.findOne({ _id: req.params.sessionID });
+    const sessions = await sessionModel.find({ course: course._id });
 
-    return res.json({session, sessions})
+    return res.json({ session, sessions })
 };
 
 exports.removeSession = async (req, res) => {
-    const deletedCourse = await sessionModel.findOneAndDelete({_id: req.params.id});
+    const deletedCourse = await sessionModel.findOneAndDelete({ _id: req.params.id });
 
     if (!deletedCourse) {
         return res.status(404).json({
@@ -82,10 +81,10 @@ exports.removeSession = async (req, res) => {
 
 exports.register = async (req, res) => {
     const isUserAlreadyRegister = await courseUserModel
-      .findOne({
-          user: req.user._id,
-          course: req.params.id,
-      }).lean();
+        .findOne({
+            user: req.user._id,
+            course: req.params.id,
+        }).lean();
 
     if (isUserAlreadyRegister) {
         return res.status(409).json({
@@ -105,8 +104,8 @@ exports.register = async (req, res) => {
 };
 
 exports.getCoursesByCategory = async (req, res) => {
-    const {href} = req.params;
-    const category = await categoryModel.findOne({href: href});
+    const { href } = req.params;
+    const category = await categoryModel.findOne({ href: href });
 
     if (category) {
         const categoryCourses = await courseModel.find({
@@ -120,16 +119,16 @@ exports.getCoursesByCategory = async (req, res) => {
 
 exports.getOne = async (req, res) => {
     const course = await courseModel
-        .findOne({href: req.params.href})
+        .findOne({ href: req.params.href })
         .populate("creator", "-password")
         .populate("categoryID")
         .lean();
-        
-    const sessions = await sessionModel.find({course: course._id})
-    .populate("course")
-    .lean();
 
-    const comments = await commentsModel.find({course: course._id, isAccept: 1})
+    const sessions = await sessionModel.find({ course: course._id })
+        .populate("course")
+        .lean();
+
+    const comments = await commentsModel.find({ course: course._id, isAccept: 1 })
         .populate("creator", "-password")
         .lean();
 
@@ -140,9 +139,30 @@ exports.getOne = async (req, res) => {
         user: req.user._id,
         course: course._id,
     }));
-    
 
-    return res.json({course, sessions, comments, courseStudentsCount});
+
+    const allComments = [];
+
+    comments.forEach((comment) => {
+        comments.forEach((answerComment) => {
+            if (String(comment._id) === String(answerComment.mainCommentID)) {
+                allComments.push({
+                    ...comment,
+                    course: comment.course.name,
+                    creator: comment.creator.name,
+                    answerComment,
+                })
+            }
+        });
+
+    });
+
+    return res.json({
+        course,
+        sessions,
+        comments: allComments,
+        courseStudentsCount
+    });
 };
 
 exports.remove = async (req, res) => {
@@ -154,7 +174,7 @@ exports.remove = async (req, res) => {
         })
     }
 
-    const deletedCourse = await courseModel.findOneAndDelete({_id: req.params.id});
+    const deletedCourse = await courseModel.findOneAndDelete({ _id: req.params.id });
 
     if (!deletedCourse) {
         return res.status(404).json({
@@ -162,12 +182,12 @@ exports.remove = async (req, res) => {
         })
     }
 
-    return res.json({message: "course has been removed successfully!", deletedCourse});
+    return res.json({ message: "course has been removed successfully!", deletedCourse });
 };
 
 exports.getRelated = async (req, res) => {
-    const {href} = req.params;
-    const course = await courseModel.findOne({href});
+    const { href } = req.params;
+    const course = await courseModel.findOne({ href });
 
     if (!course) {
         return res.status(404).json({
@@ -175,9 +195,79 @@ exports.getRelated = async (req, res) => {
         })
     }
 
-    let relatedCourses = await courseModel.find({categoryID: course.categoryID});
+    let relatedCourses = await courseModel.find({ categoryID: course.categoryID });
 
     relatedCourses = relatedCourses.filter(course => course.href !== href);
-    
+
     return res.json(relatedCourses);
+};
+
+exports.popular = async (req, res) => {
+    try {
+        const courses = await courseModel
+            .find({})
+            .sort({ score: -1 }) // مرتب‌سازی نزولی بر اساس score
+            .limit(10) // محدود کردن به ۱۰ مورد برتر
+            .populate("creator", "-password") // نمایش اطلاعات سازنده دوره
+            .lean();
+
+        return res.json(courses);
+    } catch (error) {
+        console.error("Error in fetching popular courses:", error);
+        return res.status(500).json({
+            message: "Internal server error",
+        });
+    }
+};
+
+exports.pre_sell = async (req, res) => {
+    try {
+        const pre_sellCourses = await courseModel
+            .find({ status: "Pre_sale" }) // فیلتر کردن دوره‌هایی که در پیش‌فروش هستند
+            .populate("creator", "-password") // نمایش اطلاعات سازنده دوره
+            .lean();
+
+        return res.json(pre_sellCourses);
+    } catch (error) {
+        console.error("Error in fetching presale courses:", error);
+        return res.status(500).json({
+            message: "Internal server error",
+        });
+    }
+};
+
+exports.getAll = async (req, res) => {
+    const courses = await courseModel
+        .find({})
+        .populate("creator", "-password")
+        .populate("categoryID")
+        .lean()
+        .sort({ _id: -1 });
+
+    const registers = await courseUserModel.find({}).lean();
+    const comments = await commentsModel.find({}).lean();
+    const allCourses = [];
+
+    courses.forEach((course) => {
+        let courseTotalScore = 5;
+
+        const courseRegisters = registers
+            .filter((register) => register.course.toString() === course._id.toString());
+
+        const courseComments = comments.filter((comment) => {
+            return comment.course.toString() === course._id.toString();
+        });
+
+        courseComments.forEach(comment => courseTotalScore += Number(comment.score))
+
+        allCourses.push({
+            ... course,
+            categoryID: course.categoryID.title,
+            creator: course.creator.username,
+            registers: courseRegisters.length,
+            courseAverageScore: Math.floor(courseTotalScore / (courseComments.length + 1)),
+        });
+    });
+
+    return res.json(allCourses);
 };

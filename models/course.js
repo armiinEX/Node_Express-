@@ -26,7 +26,7 @@ const schema = mongoose.Schema({
         required: true,
     },
     status: {
-        type: String,
+        type: String,  //running , Completed, Presale
         required: true,
     },
     discount: {
@@ -43,6 +43,11 @@ const schema = mongoose.Schema({
         ref: "User",
         required: true,
     },
+    score: {
+        type: Number,
+        required: true,
+        default: 0,
+    }
 }, { timestamps: true});
 
 

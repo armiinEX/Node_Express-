@@ -11,7 +11,7 @@ console.log(PORT);
         console.log('✅ Connected to MongoDB ... :)');
     } catch (error) {
         console.error('❌ Error connecting to MongoDB:', error.message);
-        process.exit(1); // خروج از برنامه در صورت خطا
+        process.exit(1);
     }
 })();
 
